@@ -2,17 +2,14 @@
   "name": "anilist-compare",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://YOUR_USERNAME.github.io/anilist-compare",
   "dependencies": {
-    "gh-pages": "^6.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
-    "deploy": "gh-pages -d build"
+    "build": "react-scripts build"
   },
   "browserslist": {
     "production": [
