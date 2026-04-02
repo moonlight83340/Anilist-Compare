@@ -127,7 +127,6 @@ export default function Results({ data, users }) {
 
   return (
     <div>
-
       {/* HEADER */}
       <div style={{
         display: "flex",
@@ -135,11 +134,18 @@ export default function Results({ data, users }) {
         alignItems: "center",
         marginBottom: "40px"
       }}>
-        <div style={{ textAlign: "center" }}>
+        <a
+          href={`https://anilist.co/user/${users.A}`}
+          target="_blank"
+          rel="noreferrer"
+          style={{ textAlign: "center", textDecoration: "none", color: "inherit" }}
+        >
           <img src={users.avatarA} alt=""
             style={{ width: 120, height: 120, borderRadius: "50%" }} />
-          <div>{users.A}</div>
-        </div>
+          <div style={{ marginTop: "8px", color: "#93c5fd" }}>
+            {users.A}
+          </div>
+        </a>
 
         <div style={{
           background: "rgba(255,255,255,0.05)",
@@ -154,11 +160,18 @@ export default function Results({ data, users }) {
           </div>
         </div>
 
-        <div style={{ textAlign: "center" }}>
+        <a
+          href={`https://anilist.co/user/${users.B}`}
+          target="_blank"
+          rel="noreferrer"
+          style={{ textAlign: "center", textDecoration: "none", color: "inherit" }}
+        >
           <img src={users.avatarB} alt=""
             style={{ width: 120, height: 120, borderRadius: "50%" }} />
-          <div>{users.B}</div>
-        </div>
+          <div style={{ marginTop: "8px", color: "#93c5fd" }}>
+            {users.B}
+          </div>
+        </a>
       </div>
 
       {/* WATCH STATS */}
