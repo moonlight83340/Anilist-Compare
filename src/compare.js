@@ -251,6 +251,16 @@ export function getRankColor(rank) {
   }
 }
 
+export function getRankDescription(score) {
+  if (score >= 90) return "Soulmates. You basically share the same brain.";
+  if (score >= 75) return "Amazing chemistry — your watch lists are practically twins.";
+  if (score >= 60) return "Solid match! You'd have plenty to talk about at a con.";
+  if (score >= 45) return "Decent overlap — enough common ground to vibe.";
+  if (score >= 30) return "Some shared interests, but your tastes diverge quite a bit.";
+  if (score >= 15) return "A small spark of agreement — at least you both like anime.";
+  return "Complete opposites. One loves what the other skips.";
+}
+
 export function compareUsers(A, B) {
   const A_completed = A.completed;
   const B_completed = B.completed;

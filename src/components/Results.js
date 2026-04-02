@@ -1,12 +1,13 @@
 import React from "react";
 import AnimeList from "./AnimeList";
-import { getRank, getRankColor } from "../compare";
+import { getRank, getRankColor, getRankDescription } from "../compare";
 
 export default function Results({ data, users }) {
   if (!data) return null;
 
   const rank = getRank(data.compatibility);
   const color = getRankColor(rank);
+  const description = getRankDescription(data.compatibility);
 
   const toAniList = (name, type = "anime") => {
     return `https://anilist.co/search/${type}?search=${encodeURIComponent(name)}`;
@@ -129,49 +130,120 @@ export default function Results({ data, users }) {
     <div>
       {/* HEADER */}
       <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "40px"
+        background: "rgba(255,255,255,0.03)",
+        borderRadius: "16px",
+        padding: "30px 40px",
+        marginBottom: "40px",
+        borderTop: "1px solid rgba(255,255,255,0.08)",
+        borderBottom: "1px solid rgba(255,255,255,0.08)"
       }}>
-        <a
-          href={`https://anilist.co/user/${users.A}`}
-          target="_blank"
-          rel="noreferrer"
-          style={{ textAlign: "center", textDecoration: "none", color: "inherit" }}
-        >
-          <img src={users.avatarA} alt=""
-            style={{ width: 120, height: 120, borderRadius: "50%" }} />
-          <div style={{ marginTop: "8px", color: "#93c5fd" }}>
-            {users.A}
-          </div>
-        </a>
-
         <div style={{
-          background: "rgba(255,255,255,0.05)",
-          padding: "25px 40px",
-          borderRadius: "15px",
-          textAlign: "center"
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
         }}>
-          <div style={{ opacity: 0.6 }}>COMPATIBILITY</div>
-          <h2 style={{ fontSize: "3rem" }}>{data.compatibility}%</h2>
-          <div style={{ fontSize: "4rem", fontWeight: "bold", color }}>
-            {rank}
-          </div>
-        </div>
 
-        <a
-          href={`https://anilist.co/user/${users.B}`}
-          target="_blank"
-          rel="noreferrer"
-          style={{ textAlign: "center", textDecoration: "none", color: "inherit" }}
-        >
-          <img src={users.avatarB} alt=""
-            style={{ width: 120, height: 120, borderRadius: "50%" }} />
-          <div style={{ marginTop: "8px", color: "#93c5fd" }}>
-            {users.B}
+          {/* USER A */}
+          <a
+            href={`https://anilist.co/user/${users.A}`}
+            target="_blank"
+            rel="noreferrer"
+            style={{ textAlign: "center", textDecoration: "none", color: "inherit" }}
+          >
+            <img src={users.avatarA} alt=""
+              style={{
+                width: 140,
+                height: 140,
+                borderRadius: "50%",
+                border: "3px solid rgba(255,255,255,0.15)",
+                boxShadow: "0 0 20px rgba(0,0,0,0.4)"
+              }}
+            />
+            <div style={{
+              marginTop: "12px",
+              fontSize: "1.4rem",
+              fontWeight: "bold"
+            }}>
+              {users.A}
+            </div>
+          </a>
+
+          {/* COMPATIBILITY */}
+          <div style={{
+            background: "rgba(255,255,255,0.05)",
+            border: "1px dashed rgba(255,255,255,0.1)",
+            padding: "25px 45px",
+            borderRadius: "16px",
+            textAlign: "center"
+          }}>
+            <div style={{
+              fontSize: "0.7rem",
+              letterSpacing: "4px",
+              textTransform: "uppercase",
+              opacity: 0.5,
+              marginBottom: "10px"
+            }}>
+              Compatibility
+            </div>
+
+            {/* Score + Rank sur la même ligne */}
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "15px"
+            }}>
+              <span style={{ fontSize: "3.5rem", fontWeight: "bold" }}>
+                {data.compatibility}%
+              </span>
+              <span style={{
+                fontSize: "3.5rem",
+                fontWeight: "900",
+                color,
+                textShadow: `0 0 20px ${color}40`
+              }}>
+                {rank}
+              </span>
+            </div>
+
+            {/* Description */}
+            <div style={{
+              marginTop: "10px",
+              fontSize: "0.8rem",
+              opacity: 0.5,
+              maxWidth: "280px",
+              lineHeight: 1.4
+            }}>
+              {description}
+            </div>
           </div>
-        </a>
+
+          {/* USER B */}
+          <a
+            href={`https://anilist.co/user/${users.B}`}
+            target="_blank"
+            rel="noreferrer"
+            style={{ textAlign: "center", textDecoration: "none", color: "inherit" }}
+          >
+            <img src={users.avatarB} alt=""
+              style={{
+                width: 140,
+                height: 140,
+                borderRadius: "50%",
+                border: "3px solid rgba(255,255,255,0.15)",
+                boxShadow: "0 0 20px rgba(0,0,0,0.4)"
+              }}
+            />
+            <div style={{
+              marginTop: "12px",
+              fontSize: "1.4rem",
+              fontWeight: "bold"
+            }}>
+              {users.B}
+            </div>
+          </a>
+
+        </div>
       </div>
 
       {/* WATCH STATS */}
