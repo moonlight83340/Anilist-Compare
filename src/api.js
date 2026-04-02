@@ -17,6 +17,7 @@ export async function fetchUser(username) {
               duration
               startDate { year }
               studios { nodes { name } }
+              averageScore
               siteUrl
               coverImage { large }
             }
@@ -28,9 +29,18 @@ export async function fetchUser(username) {
         avatar { large }
 
         favourites {
-          anime {
+          anime(perPage: 25) {
             nodes {
               title { romaji }
+              siteUrl
+              coverImage { large }
+            }
+          }
+          characters(perPage: 25) {
+            nodes {
+              name { full }
+              siteUrl
+              image { large }
             }
           }
         }
@@ -45,7 +55,6 @@ export async function fetchUser(username) {
   });
 
   const json = await res.json();
-
   const lists = json.data?.MediaListCollection?.lists || [];
 
   const completed = {};
@@ -55,7 +64,6 @@ export async function fetchUser(username) {
   lists.forEach(list => {
     list.entries?.forEach(e => {
       if (!e?.media) return;
-
       const title = e.media.title?.romaji;
       if (!title) return;
 
@@ -69,6 +77,7 @@ export async function fetchUser(username) {
         duration: e.media.duration || 24,
         repeat: e.repeat || 0,
         year: e.media.startDate?.year,
+        averageScore: e.media.averageScore || null,
         url: e.media.siteUrl || null,
         cover: e.media.coverImage?.large || null
       };
@@ -86,17 +95,28 @@ export async function fetchUser(username) {
     });
   });
 
-  const favNodes = json.data?.User?.favourites?.anime?.nodes || [];
+  // ── Favourite Anime ──
+  const favAnimeNodes = json.data?.User?.favourites?.anime?.nodes || [];
+  const favouriteAnime = favAnimeNodes.map(a => ({
+    title: a.title?.romaji,
+    url: a.siteUrl || null,
+    cover: a.coverImage?.large || null
+  })).filter(a => a.title);
 
-  const favourites = new Set(
-    favNodes.map(a => a.title?.romaji).filter(Boolean)
-  );
+  // ── Favourite Characters ──
+  const favCharNodes = json.data?.User?.favourites?.characters?.nodes || [];
+  const favouriteCharacters = favCharNodes.map(c => ({
+    name: c.name?.full,
+    url: c.siteUrl || null,
+    image: c.image?.large || null
+  })).filter(c => c.name);
 
   return {
     completed,
     planning,
     watching,
-    favourites,
+    favouriteAnime,
+    favouriteCharacters,
     avatar: json.data?.User?.avatar?.large || null
   };
 }
@@ -116,10 +136,7 @@ export async function searchUsers(queryText) {
   const res = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      query,
-      variables: { search: queryText }
-    })
+    body: JSON.stringify({ query, variables: { search: queryText } })
   });
 
   const json = await res.json();

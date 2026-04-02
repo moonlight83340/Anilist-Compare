@@ -160,6 +160,38 @@ function computeProgress(user) {
   };
 }
 
+function computeCommonFavAnime(A, B) {
+  const setA = new Set(A.favouriteAnime.map(a => a.title));
+  const common = B.favouriteAnime.filter(a => setA.has(a.title));
+
+  const totalUnique = new Set([
+    ...A.favouriteAnime.map(a => a.title),
+    ...B.favouriteAnime.map(a => a.title)
+  ]).size;
+
+  const percent = totalUnique
+    ? Math.round((common.length / totalUnique) * 100)
+    : 0;
+
+  return { common, percent };
+}
+
+function computeCommonFavCharacters(A, B) {
+  const setA = new Set(A.favouriteCharacters.map(c => c.name));
+  const common = B.favouriteCharacters.filter(c => setA.has(c.name));
+
+  const totalUnique = new Set([
+    ...A.favouriteCharacters.map(c => c.name),
+    ...B.favouriteCharacters.map(c => c.name)
+  ]).size;
+
+  const percent = totalUnique
+    ? Math.round((common.length / totalUnique) * 100)
+    : 0;
+
+  return { common, percent };
+}
+
 function computeCompatibility(A, B) {
   const common = Object.keys(A.completed).filter(
     t => t in B.completed
@@ -227,25 +259,45 @@ export function compareUsers(A, B) {
 
   const recommendations = Object.values(B_completed)
     .filter(a => A_planning_titles.has(a.title))
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => b.score - a.score)
+    .map(a => ({
+      ...a,
+      scoreB: a.score,
+      scoreA: null
+    }));
 
-  const common = Object.values(A_completed).filter(
-    a => a.title in B_completed
-  );
+  const common = Object.values(A_completed)
+    .filter(a => a.title in B_completed)
+    .map(a => ({
+      ...a,
+      scoreA: a.score,
+      scoreB: B_completed[a.title].score
+    }));
 
-  const uniqueA = Object.values(A_completed).filter(
-    a => !(a.title in B_completed)
-  );
+  const uniqueA = Object.values(A_completed)
+    .filter(a => !(a.title in B_completed))
+    .map(a => ({
+      ...a,
+      scoreA: a.score,
+      scoreB: null
+    }));
 
-  const uniqueB = Object.values(B_completed).filter(
-    a => !(a.title in A_completed)
-  );
+  const uniqueB = Object.values(B_completed)
+    .filter(a => !(a.title in A_completed))
+    .map(a => ({
+      ...a,
+      scoreB: a.score,
+      scoreA: null
+    }));
 
   const tagsA = computeTags(A);
   const tagsB = computeTags(B);
 
   const studiosA = computeStudios(A);
   const studiosB = computeStudios(B);
+
+  const favAnime = computeCommonFavAnime(A, B);
+  const favCharacters = computeCommonFavCharacters(A, B);
 
   return {
     recommendations,
@@ -273,6 +325,15 @@ export function compareUsers(A, B) {
 
     studiosA,
     studiosB,
-    commonStudios: intersection(studiosA, studiosB)
+    commonStudios: intersection(studiosA, studiosB),
+    favAnimeA: A.favouriteAnime,
+    favAnimeB: B.favouriteAnime,
+    commonFavAnime: favAnime.common,
+    commonFavAnimePercent: favAnime.percent,
+
+    favCharactersA: A.favouriteCharacters,
+    favCharactersB: B.favouriteCharacters,
+    commonFavCharacters: favCharacters.common,
+    commonFavCharactersPercent: favCharacters.percent
   };
 }

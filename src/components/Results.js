@@ -12,6 +12,119 @@ export default function Results({ data, users }) {
     return `https://anilist.co/search/${type}?search=${encodeURIComponent(name)}`;
   };
 
+  const FavGrid = ({ items, type }) => {
+    if (!items || items.length === 0) {
+      return (
+        <div style={{ opacity: 0.5, fontStyle: "italic", marginTop: 8 }}>
+          Nothing in Common!
+        </div>
+      );
+    }
+
+    return (
+      <div style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "12px",
+        marginTop: "12px"
+      }}>
+        {items.map((item, i) => (
+          <a
+            key={i}
+            href={item.url}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+              textAlign: "center",
+              width: "80px"
+            }}
+          >
+            <img
+              src={type === "anime" ? item.cover : item.image}
+              alt=""
+              style={{
+                width: 80,
+                height: 110,
+                objectFit: "cover",
+                borderRadius: "8px",
+                border: "2px solid rgba(255,255,255,0.1)"
+              }}
+            />
+            <div style={{
+              fontSize: "0.7rem",
+              marginTop: "4px",
+              opacity: 0.8,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}>
+              {type === "anime" ? item.title : item.name}
+            </div>
+          </a>
+        ))}
+      </div>
+    );
+  };
+
+  /* ── petit composant top 10 en deux colonnes ── */
+  const FavColumns = ({ listA, listB, type }) => (
+    <div style={{
+      display: "flex",
+      justifyContent: "space-between",
+      gap: "20px",
+      marginTop: "15px"
+    }}>
+      {[listA, listB].map((list, i) => (
+        <div key={i} style={{ flex: 1 }}>
+          <strong>{i === 0 ? users.A : users.B}</strong>
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "6px",
+            marginTop: "8px"
+          }}>
+            {(list || []).slice(0, 10).map((item, j) => (
+              <a
+                key={j}
+                href={item.url}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  textDecoration: "none",
+                  color: type === "anime" ? "#a78bfa" : "#f472b6"
+                }}
+              >
+                <img
+                  src={type === "anime" ? item.cover : item.image}
+                  alt=""
+                  style={{
+                    width: 32,
+                    height: 44,
+                    objectFit: "cover",
+                    borderRadius: "4px"
+                  }}
+                />
+                <span style={{ fontSize: "0.85rem" }}>
+                  {type === "anime" ? item.title : item.name}
+                </span>
+              </a>
+            ))}
+            {(!list || list.length === 0) && (
+              <span style={{ opacity: 0.4, fontStyle: "italic" }}>
+                No favourites
+              </span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div>
 
@@ -22,7 +135,6 @@ export default function Results({ data, users }) {
         alignItems: "center",
         marginBottom: "40px"
       }}>
-
         <div style={{ textAlign: "center" }}>
           <img src={users.avatarA} alt=""
             style={{ width: 120, height: 120, borderRadius: "50%" }} />
@@ -36,16 +148,8 @@ export default function Results({ data, users }) {
           textAlign: "center"
         }}>
           <div style={{ opacity: 0.6 }}>COMPATIBILITY</div>
-
-          <h2 style={{ fontSize: "3rem" }}>
-            {data.compatibility}%
-          </h2>
-
-          <div style={{
-            fontSize: "4rem",
-            fontWeight: "bold",
-            color
-          }}>
+          <h2 style={{ fontSize: "3rem" }}>{data.compatibility}%</h2>
+          <div style={{ fontSize: "4rem", fontWeight: "bold", color }}>
             {rank}
           </div>
         </div>
@@ -60,7 +164,6 @@ export default function Results({ data, users }) {
       {/* WATCH STATS */}
       <div className="card">
         <h2>Watch Stats</h2>
-
         <table>
           <tbody>
             <tr>
@@ -74,13 +177,9 @@ export default function Results({ data, users }) {
               <td>{data.statsB.totalEpisodes}</td>
             </tr>
             <tr>
-              <td>
-                {data.statsA.totalHours}h ({data.statsA.totalDays}d)
-              </td>
+              <td>{data.statsA.totalHours}h ({data.statsA.totalDays}d)</td>
               <td>Time Watched</td>
-              <td>
-                {data.statsB.totalHours}h ({data.statsB.totalDays}d)
-              </td>
+              <td>{data.statsB.totalHours}h ({data.statsB.totalDays}d)</td>
             </tr>
             <tr>
               <td>{data.statsA.meanScore}</td>
@@ -91,59 +190,24 @@ export default function Results({ data, users }) {
         </table>
       </div>
 
-      {/* 🔥 WATCH PROGRESSION */}
+      {/* WATCH PROGRESS */}
       <div className="card">
         <h2>Watch Progress</h2>
-
         {[data.progressA, data.progressB].map((p, i) => (
           <div key={i} style={{ marginTop: "20px" }}>
             <strong>{i === 0 ? users.A : users.B}</strong>
-
-            {/* BAR */}
-            <div
-              style={{
-                height: "12px",
-                borderRadius: "10px",
-                overflow: "hidden",
-                background: "rgba(255,255,255,0.1)",
-                marginTop: "8px",
-                display: "flex"
-              }}
-            >
-              {/* COMPLETED */}
-              <div
-                style={{
-                  width: `${p.completedPercent}%`,
-                  background: "linear-gradient(90deg, #22c55e, #4ade80)"
-                }}
-              />
-            
-              {/* WATCHING */}
-              <div
-                style={{
-                  width: `${p.watchingPercent}%`,
-                  background: "linear-gradient(90deg, #38bdf8, #60a5fa)" // 🔵
-                }}
-              />
-            
-              {/* PLANNING */}
-              <div
-                style={{
-                  width: `${p.planningPercent}%`,
-                  background: "linear-gradient(90deg, #6366f1, #818cf8)"
-                }}
-              />
-            </div>
-
-            {/* LABELS */}
             <div style={{
-              display: "flex",
-              justifyContent: "space-between",
-              fontSize: "0.85rem",
-              opacity: 0.7,
-              marginTop: "5px",
-              flexWrap: "wrap",
-              gap: "10px"
+              height: "12px", borderRadius: "10px", overflow: "hidden",
+              background: "rgba(255,255,255,0.1)", marginTop: "8px", display: "flex"
+            }}>
+              <div style={{ width: `${p.completedPercent}%`, background: "linear-gradient(90deg, #22c55e, #4ade80)" }} />
+              <div style={{ width: `${p.watchingPercent}%`, background: "linear-gradient(90deg, #38bdf8, #60a5fa)" }} />
+              <div style={{ width: `${p.planningPercent}%`, background: "linear-gradient(90deg, #6366f1, #818cf8)" }} />
+            </div>
+            <div style={{
+              display: "flex", justifyContent: "space-between",
+              fontSize: "0.85rem", opacity: 0.7, marginTop: "5px",
+              flexWrap: "wrap", gap: "10px"
             }}>
               <span>✔ {p.completed} ({p.completedPercent}%)</span>
               <span>👀 {p.watching} ({p.watchingPercent}%)</span>
@@ -153,28 +217,21 @@ export default function Results({ data, users }) {
         ))}
       </div>
 
-      {/* 🔥 RELEASE YEAR FIXED */}
+      {/* RELEASE YEAR */}
       <div className="card">
         <h2>Release Year Stats</h2>
-
         {Object.keys(data.yearA || {}).map(year => {
           const A = data.yearA[year];
           const B = data.yearB[year];
-
           const diff = (A.meanScore - B.meanScore).toFixed(2);
-
           return (
             <div key={year} style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: "10px"
+              display: "flex", justifyContent: "space-between", marginTop: "10px"
             }}>
               <span>{A.proportion}%</span>
-
               <span style={{ opacity: 0.7 }}>
                 {year} ({diff > 0 ? "+" : ""}{diff})
               </span>
-
               <span>{B.proportion}%</span>
             </div>
           );
@@ -184,13 +241,11 @@ export default function Results({ data, users }) {
       {/* GENRES */}
       <div className="card">
         <h2>Top Genres</h2>
-
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div>
             <strong>{users.A}</strong>
             <div>{data.genresA?.join(", ")}</div>
           </div>
-
           <div>
             <strong>{users.B}</strong>
             <div>{data.genresB?.join(", ")}</div>
@@ -201,28 +256,19 @@ export default function Results({ data, users }) {
       {/* TAGS */}
       <div className="card">
         <h2>Top Tags</h2>
-
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           {[data.tagsA, data.tagsB].map((tags, i) => (
             <div key={i}>
               <strong>{i === 0 ? users.A : users.B}</strong>
-
               {tags?.map(tag => (
                 <div key={tag}>
-                  <a
-                    href={toAniList(tag)}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ color: "#a78bfa" }} // 🔥 FIX couleur
-                  >
-                    {tag}
-                  </a>
+                  <a href={toAniList(tag)} target="_blank" rel="noreferrer"
+                    style={{ color: "#a78bfa" }}>{tag}</a>
                 </div>
               ))}
             </div>
           ))}
         </div>
-
         <div style={{ marginTop: 10, opacity: 0.7 }}>
           Common: {data.commonTags?.join(", ") || "Nothing in common"}
         </div>
@@ -231,39 +277,99 @@ export default function Results({ data, users }) {
       {/* STUDIOS */}
       <div className="card">
         <h2>Top Studios</h2>
-
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           {[data.studiosA, data.studiosB].map((studios, i) => (
             <div key={i}>
               <strong>{i === 0 ? users.A : users.B}</strong>
-
               {studios?.map(s => (
                 <div key={s}>
-                  <a
-                    href={toAniList(s)}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ color: "#34d399" }} // 🔥 FIX couleur
-                  >
-                    {s}
-                  </a>
+                  <a href={toAniList(s)} target="_blank" rel="noreferrer"
+                    style={{ color: "#34d399" }}>{s}</a>
                 </div>
               ))}
             </div>
           ))}
         </div>
-
         <div style={{ marginTop: 10, opacity: 0.7 }}>
           Common: {data.commonStudios?.join(", ") || "Nothing in common"}
         </div>
       </div>
 
-      {/* LISTS */}
-      <AnimeList title={`🔥 Recommended from ${users.B}`} items={data.recommendations} />
-      <AnimeList title="🤝 Common anime" items={data.common} />
-      <AnimeList title={`📺 Only watched by ${users.A}`} items={data.uniqueA} />
-      <AnimeList title={`📺 Only watched by ${users.B}`} items={data.uniqueB} />
+      <div className="card">
+        <h2>❤️ Common Favourite Anime</h2>
 
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "15px",
+          marginBottom: "10px"
+        }}>
+          <div style={{
+            flex: 1, height: "10px", borderRadius: "10px",
+            background: "rgba(255,255,255,0.1)", overflow: "hidden"
+          }}>
+            <div style={{
+              width: `${data.commonFavAnimePercent}%`,
+              height: "100%",
+              background: "linear-gradient(90deg, #a78bfa, #c084fc)",
+              borderRadius: "10px",
+              transition: "width 0.5s ease"
+            }} />
+          </div>
+          <span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>
+            {data.commonFavAnimePercent}%
+          </span>
+        </div>
+
+        <FavGrid items={data.commonFavAnime} type="anime" />
+
+        <FavColumns
+          listA={data.favAnimeA}
+          listB={data.favAnimeB}
+          type="anime"
+        />
+      </div>
+
+      <div className="card">
+        <h2>💜 Common Favourite Characters</h2>
+
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "15px",
+          marginBottom: "10px"
+        }}>
+          <div style={{
+            flex: 1, height: "10px", borderRadius: "10px",
+            background: "rgba(255,255,255,0.1)", overflow: "hidden"
+          }}>
+            <div style={{
+              width: `${data.commonFavCharactersPercent}%`,
+              height: "100%",
+              background: "linear-gradient(90deg, #f472b6, #fb7185)",
+              borderRadius: "10px",
+              transition: "width 0.5s ease"
+            }} />
+          </div>
+          <span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>
+            {data.commonFavCharactersPercent}%
+          </span>
+        </div>
+
+        <FavGrid items={data.commonFavCharacters} type="character" />
+
+        <FavColumns
+          listA={data.favCharactersA}
+          listB={data.favCharactersB}
+          type="character"
+        />
+      </div>
+
+      {/* LISTS */}
+      <AnimeList title={`🔥 Recommended from ${users.B}`} items={data.recommendations} userB={users.B} />
+      <AnimeList title="🤝 Common anime" items={data.common} userA={users.A} userB={users.B} />
+      <AnimeList title={`📺 Only watched by ${users.A}`} items={data.uniqueA} userA={users.A} />
+      <AnimeList title={`📺 Only watched by ${users.B}`} items={data.uniqueB} userB={users.B} />
     </div>
   );
 }
